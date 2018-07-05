@@ -6,16 +6,16 @@ const server = require('./server');
 
 const port = 25336;
 
+let s;
+
 describe('GET', () => {
     it('returns a stream if current stream count is less than 3', done => {
         const db = {
             getStreamCount: (userId, cb) => cb(null, 2),
         };
-        const s = server(db);
+        const s = server(db).listen(port);
         const userId = '123';
         const videoId = 'abc';
-
-        s.listen(port);
 
         http.get(`http://localhost:${port}/${userId}/video-session/${videoId}`, res => {
             let data = '';
@@ -29,9 +29,9 @@ describe('GET', () => {
                 assert.equal(res.statusCode, 200);
                 assert.equal(x.message, 'dee daa doo dee');
 
-                done();
+                s.close();
 
-                s.close(() => {});
+                done();
             });
         });
     });
@@ -40,7 +40,7 @@ describe('GET', () => {
         const db = {
             getStreamCount: (userId, cb) => cb(null, 3),
         };
-        const s = server(db);
+        const s = server(db).listen(port);
         const userId = '123';
         const videoId = 'abc';
 
@@ -58,6 +58,8 @@ describe('GET', () => {
                 assert.equal(res.statusCode, 400);
                 assert.equal(x.message, 'too many active streams!');
 
+                s.close();
+
                 done();
             });
         });
@@ -68,7 +70,7 @@ describe('GET', () => {
         const db = {
             getStreamCount: (userId, cb) => cb(err, -1),
         };
-        const s = server(db);
+        const s = server(db).listen(port);
         const userId = '123';
         const videoId = 'abc';
 
@@ -85,6 +87,8 @@ describe('GET', () => {
 
                 assert.equal(res.statusCode, 500);
                 assert.deepEqual(x, err);
+
+                s.close();
 
                 done();
             });
