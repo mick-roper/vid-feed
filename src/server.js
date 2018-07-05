@@ -7,7 +7,14 @@ module.exports = db => {
         const userId = req.params.userId;
         const videoId = req.params.videoId;
 
-        res.status(501).send();
+        db.getStreamCount(userId, count => {
+            if (count < 3) {
+                res.status(200).json({ message: 'dee daa doo dee' });
+                return;
+            }
+
+            res.status(400).json({ message: 'too many active streams!' });
+        });
     });
 
     // updates the position of the users stream
