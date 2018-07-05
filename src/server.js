@@ -1,6 +1,6 @@
 const Express = require('express');
 
-module.export = db => {
+module.exports = db => {
     const app = Express();
     // starts getting a video streaming session
     app.get('/:userId/video-session/:videoId', (req, res) => {
