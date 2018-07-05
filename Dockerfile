@@ -1,4 +1,4 @@
-FROM 9-alpine
+FROM alpine-9
 
 WORKDIR /app
 

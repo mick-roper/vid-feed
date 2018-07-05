@@ -23,7 +23,7 @@ module.exports = db => {
                     return;
                 }
 
-                res.status(200).json({ message: 'dee daa doo dee' });
+                res.status(200).json({ message: 'dee daa doo dee', meta: { activeStreams: count } });
             });
         });
     });

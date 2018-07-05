@@ -14,8 +14,7 @@ The app is deployed to an AWS docker instance. Address is *http://tempuri.org*
 
 | Endpoint | Purpose | Method |
 |----------|---------|--------|
-| /{user-id}/video-stream/{video-id} | Attempts to get a new streaming session | GET |
-| /{user-id}/video-stream/{video-id} | Attempts to update a streaming session | PUT |
-| /{user-id}/video-stream/{video-id} | Attempts to delete streaming session | DELETE |
+| /{user-id}/session | Attempts to get a new streaming session | GET |
+| /{user-id}/session | Attempts to delete streaming session | DELETE |
 
-All endpoint variables are made up - you can put anything in there and it'll work just fine!
+User ID variable is made up - put whatever you want in there. Be aware; the value is used as the 'group key' when counting live sessions.
