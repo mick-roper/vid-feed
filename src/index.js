@@ -1,5 +1,5 @@
-const db = require('./db')();
-const server = require('./server')(db);
+const db = require('./db')
+const server = require('./server')(db());
 
 const port = process.env.PORT || 8080;
 
