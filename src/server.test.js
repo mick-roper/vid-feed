@@ -131,6 +131,69 @@ describe('GET', () => {
     });
 });
 
-describe('PUT', () => {
-    
+describe('DELETE', () => {
+    it('decrements the stream count', done => {
+        let count = 3;
+        let actualuserId;
+        const db = {
+            decStreamCount: (userId, cb) => { 
+                actualuserId = userId; 
+                count -= 1; 
+                cb();
+            },
+        };
+
+        const s = server(db).listen(port);
+        const userId = '123';
+        const videoId = 'abc';
+
+        http.get(`http://localhost:${port}/${userId}/video-session/${videoId}`, res => {
+            let data = '';
+            res.on('data', chunk => {
+                data += chunk;
+            });
+
+            res.on('end', () => {    
+                let x = JSON.parse(data);
+
+                assert.equal(actualuserId, userId);
+                assert.equal(res.statusCode, 200);
+                assert.equal(x.message, 'session deleted');
+                assert.equal(count, 2);
+
+                s.close();
+
+                done();
+            });
+        });
+    });
+
+    it('returns 500 on error', done => {
+        const err = { err: 'its dead, Jim!' };
+        const db = {
+            decStreamCount: (_, cb) => cb(err),
+        };
+
+        const s = server(db).listen(port);
+        const userId = '123';
+        const videoId = 'abc';
+
+        http.get(`http://localhost:${port}/${userId}/video-session/${videoId}`, res => {
+            let data = '';
+            res.on('data', chunk => {
+                data += chunk;
+            });
+
+            res.on('end', () => {    
+                let x = JSON.parse(data);
+
+                assert.equal(res.statusCode, 500);
+                assert.deepEqual(x, err);
+
+                s.close();
+
+                done();
+            });
+        });
+    });
 });
