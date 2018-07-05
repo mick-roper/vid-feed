@@ -13,12 +13,19 @@ module.exports = db => {
                 return;
             }
 
-            if (count < 3) {
-                res.status(200).json({ message: 'dee daa doo dee' });
+            if (count >= 3) {
+                res.status(400).json({ message: 'too many active streams!' });
                 return;
             }
 
-            res.status(400).json({ message: 'too many active streams!' });
+            db.incStreamCount(userId, err => {
+                if (err) {
+                    res.status(500).json(err); // shouldnt do this in production!
+                    return;
+                }
+
+                res.status(200).json({ message: 'dee daa doo dee' });
+            });
         });
     });
 
