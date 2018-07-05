@@ -9,13 +9,13 @@ const port = 25336;
 describe('GET', () => {
     it('returns a stream if current stream count is less than 3', done => {
         const db = {
-            getStreamCount: (userId, cb) => cb(2),
+            getStreamCount: (userId, cb) => cb(null, 2),
         };
         const s = server(db);
         const userId = '123';
         const videoId = 'abc';
 
-        before(() => s.listen(port));
+        s.listen(port);
 
         http.get(`http://localhost:${port}/${userId}/video-session/${videoId}`, res => {
             let data = '';
@@ -30,13 +30,15 @@ describe('GET', () => {
                 assert.equal(x.message, 'dee daa doo dee');
 
                 done();
+
+                s.close(() => {});
             });
         });
     });
 
     it('returns bad request if count is gte than 3', done => {
         const db = {
-            getStreamCount: (userId, cb) => cb(3),
+            getStreamCount: (userId, cb) => cb(null, 3),
         };
         const s = server(db);
         const userId = '123';
@@ -45,9 +47,47 @@ describe('GET', () => {
         s.listen(port);
 
         http.get(`http://localhost:${port}/${userId}/video-session/${videoId}`, res => {
-            assert.equal(res.statusCode, 400);
+            let data = '';
+            res.on('data', chunk => {
+                data += chunk;
+            });
 
-            done();
+            res.on('end', () => {    
+                let x = JSON.parse(data);
+
+                assert.equal(res.statusCode, 400);
+                assert.equal(x.message, 'too many active streams!');
+
+                done();
+            });
+        });
+    });
+
+    it('returns 500 response if an error occurs', done => {
+        const err = { err: 'its dead, Jim!' };
+        const db = {
+            getStreamCount: (userId, cb) => cb(err, -1),
+        };
+        const s = server(db);
+        const userId = '123';
+        const videoId = 'abc';
+
+        s.listen(port);
+
+        http.get(`http://localhost:${port}/${userId}/video-session/${videoId}`, res => {
+            let data = '';
+            res.on('data', chunk => {
+                data += chunk;
+            });
+
+            res.on('end', () => {    
+                let x = JSON.parse(data);
+
+                assert.equal(res.statusCode, 500);
+                assert.deepEqual(x, err);
+
+                done();
+            });
         });
     });
 })

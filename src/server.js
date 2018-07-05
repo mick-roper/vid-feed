@@ -7,7 +7,12 @@ module.exports = db => {
         const userId = req.params.userId;
         const videoId = req.params.videoId;
 
-        db.getStreamCount(userId, count => {
+        db.getStreamCount(userId, (err, count) => {
+            if (err) {
+                res.status(500).json(err); // shouldnt do this in production!
+                return;
+            }
+
             if (count < 3) {
                 res.status(200).json({ message: 'dee daa doo dee' });
                 return;
