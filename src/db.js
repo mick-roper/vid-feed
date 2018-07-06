@@ -3,18 +3,43 @@ module.exports = () => {
 
     const obj = {
         getStreamCount: (userId, cb) => {
+            if (!userId) {
+                if (cb) {
+                    cb({ message: 'no userId param' });
+                }
+                return;
+            }
+
             let count = store[userId] || 0;
 
-            cb(null, count);
+            if (cb) {
+                cb(null, count);
+            }
         },
         incStreamCount: (userId, cb) => {
+            if (!userId) {
+                if (cb) {
+                    cb({ message: 'no userId param' });
+                }
+                return;
+            }
+
             let count = store[userId] || 0;
 
             store[userId] = count + 1;
 
-            cb();
+            if (cb) {
+                cb();
+            }
         },
         decStreamCount: (userId, cb) => {
+            if (!userId) {
+                if (cb) {
+                    cb({ message: 'no userId param' });
+                }
+                return;
+            }
+
             let count = store[userId];
 
             if (count) {
@@ -27,7 +52,9 @@ module.exports = () => {
                 }
             }
 
-            cb();
+            if (cb) {
+                cb();
+            }
         }
     }
 
